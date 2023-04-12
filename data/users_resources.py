@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from data.users import User
-from data import db_session, news_api, jobs_api
+from data import db_session
 from flask_restful import abort, Api, Resource
 from data.reqparse import parser
 

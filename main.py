@@ -2,12 +2,11 @@ import flask
 import os
 from flask import Flask, redirect, render_template, make_response, request, session, abort
 import datetime
-from data.jobs import Jobs
-from data.news import News
+from data.items import Items
 from data.users import User
-from form.user import LoginForm, RegisterForm, NewsForm
+from form.user import LoginForm, RegisterForm, ItemsForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from data import db_session, news_api, jobs_api, news_resources, users_resources
+from data import db_session, items_api, items_resources, users_resources
 from flask_restful import Api
 import logging
 from telegram.ext import Application, MessageHandler, filters
@@ -40,22 +39,22 @@ def bad_request(_):
 def index():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
-        news = db_sess.query(News).filter(
-            (News.user == current_user) | (News.is_private != True))
+        items = db_sess.query(Items).filter(
+            (Items.user == current_user) | (Items.is_private != True))
     else:
-        news = db_sess.query(News).filter(News.is_private != True)
-    return render_template("index.html", news=news)
+        items = db_sess.query(Items).filter(Items.is_private != True)
+    return render_template("index.html", news=items)
 
 
 @app.route("/account")
 def account():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
-        news = db_sess.query(News).filter(
-            (News.user == current_user) | (News.is_private != True))
+        items = db_sess.query(Items).filter(
+            (Items.user == current_user) | (Items.is_private != True))
     else:
-        news = None
-    return render_template("account.html", news=news)
+        items = None
+    return render_template("account.html", items=items)
 
 
 @app.route('/logout')
@@ -89,64 +88,62 @@ def session_test():
         f"Вы пришли на эту страницу {visits_count + 1} раз")
 
 
-@app.route('/news',  methods=['GET', 'POST'])
+@app.route('/items',  methods=['GET', 'POST'])
 @login_required
 def add_news():
-    form = NewsForm()
+    form = ItemsForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        news = News()
-        news.title = form.title.data
-        news.content = form.content.data
-        news.is_private = form.is_private.data
-        current_user.news.append(news)
+        items = Items()
+        items.title = form.title.data
+        items.content = form.content.data
+        items.is_private = form.is_private.data
+        current_user.news.append(items)
         db_sess.merge(current_user)
         db_sess.commit()
         return redirect('/')
-    return render_template('news.html', title='Добавление новости', form=form)
+    return render_template('items.html', title='Добавление в отслеживаемое', form=form)
 
 
-@app.route('/news/<int:id>', methods=['GET', 'POST'])
+@app.route('/items/<int:id>', methods=['GET', 'POST'])
 @login_required
-def edit_news(id):
-    form = NewsForm()
+def edit_items(id):
+    form = ItemsForm()
     if request.method == "GET":
         db_sess = db_session.create_session()
-        news = db_sess.query(News).filter(News.id == id,
-                                          News.user == current_user
-                                          ).first()
-        if news:
-            form.title.data = news.title
-            form.content.data = news.content
-            form.is_private.data = news.is_private
+        items = db_sess.query(Items).filter(Items.id == id, Items.user == current_user).first()
+        if items:
+            form.title.data = items.title
+            form.content.data = items.content
+            form.is_private.data = items.is_private
         else:
             abort(404)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        news = db_sess.query(News).filter(News.id == id, News.user == current_user).first()
-        if news:
-            news.title = form.title.data
-            news.content = form.content.data
-            news.is_private = form.is_private.data
+        items = db_sess.query(Items).filter(Items.id == id, Items.user == current_user).first()
+        if items:
+            items.title = form.title.data
+            items.content = form.content.data
+            items.is_private = form.is_private.data
             db_sess.commit()
             return redirect('/')
         else:
             abort(404)
-    return render_template('news.html',
-                           title='Редактирование новости',
+    return render_template('items.html',
+                           title='Редактирование отслеживаемого',
                            form=form
                            )
 
 
-@app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
+@app.route('/items_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
-def news_delete(id):
+def items_delete(id):
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.id == id,
-                                      News.user == current_user
+    items = db_sess.query(Items).filter(Items.id == id,
+                                      Items.user == current_user
                                       ).first()
-    if news:
-        db_sess.delete(news)
+    if items:
+        db_sess.delete(items)
         db_sess.commit()
     else:
         abort(404)
@@ -224,47 +221,25 @@ def main():
     db_sess.add(user)
     db_sess.commit()
     
-    news = News()
-    news.title = 'smth'
-    news.content = 'smth'
-    news.created_date = datetime.date.today()
-    news.is_private = True
-    news.user_id = 1
+    items = Items()
+    items.title = 'fssfe'
+    items.content = 'smth'
+    items.created_date = datetime.date.today()
+    items.is_private = False
+    items.user_id = 1
+    items.price = 500
 
-    db_sess.add(news)
-
-    news = News()
-    news.title = 'fssfe'
-    news.content = 'smth'
-    news.created_date = datetime.date.today()
-    news.is_private = False
-    news.user_id = 1
-
-    db_sess.add(news)
-    db_sess.commit()
-
-    job = Jobs()
-    job.id = 1
-    job.job = 'slave'
-    job.work_size = 'huge'
-    job.collaborators = 'none'
-    job.start_date = datetime.date.today()
-    job.end_date = datetime.date.today()
-    job.is_finished = False
-    job.category = 'salad'
-
-    db_sess.add(job)
+    db_sess.add(items)
     db_sess.commit()'''
 
     api.add_resource(users_resources.UsersListResource, '/api/v2/users')
     api.add_resource(users_resources.UsersResource, '/api/v2/users/<int:users_id>')
-    api.add_resource(news_resources.NewsListResource, '/api/v2/news')
-    api.add_resource(news_resources.NewsResource, '/api/v2/news/<int:news_id>')
-    app.register_blueprint(jobs_api.blueprint)
-    app.register_blueprint(news_api.blueprint)
+    api.add_resource(items_resources.ItemListResource, '/api/v2/items')
+    api.add_resource(items_resources.ItemResource, '/api/v2/items/<int:items_id>')
+    app.register_blueprint(items_api.blueprint)
     app.run()
 
-
+    "-------------BOT_____BOT-----BOT_____BOT-----BOT_____BOT-------------"
     # Создаём объект Application.
     # Вместо слова "TOKEN" надо разместить полученный от @BotFather токен
     application = Application.builder().token(BOT_TOKEN).build()
@@ -287,6 +262,7 @@ def main():
 
     # Запускаем приложение.
     application.run_polling()
+
 
 if __name__ == '__main__':
     main()

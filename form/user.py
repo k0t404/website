@@ -4,17 +4,12 @@ from wtforms.fields import EmailField
 from wtforms.validators import DataRequired
 
 
-class JobForm(FlaskForm):
-    character = StringField('Название работа')
-    about_you = TextAreaField('Почему вы')
-    about_job = TextAreaField('Что вы будете делать')
-    submit = SubmitField('Войти')
-
-
-class NewsForm(FlaskForm):
+class ItemsForm(FlaskForm):
     title = StringField('Заголовок', validators=[DataRequired()])
     content = TextAreaField("Содержание")
     is_private = BooleanField("Личное")
+    price = IntegerField('Цена')
+    link = StringField('Ссылка')
     submit = SubmitField('Применить')
 
 

@@ -2,12 +2,10 @@
 
 {% block content %}
 <h1>Ваш профиль</h1>
-{% for item in news%}
+{% for item in items%}
 {% if item.user == current_user %}
 <div class="col-md6 border rounded">
-
         <h2>{{item.title}}</h2>
-        <a href="news" class="btn btn-secondary">Добавить новость</a>
         <div>
             {{item.content}}
         </div>
@@ -15,10 +13,13 @@
             Автор - {{item.user.name}}, Дата написания - {{item.created_date}}
         </div>
         <div>
-            <a href="/news/{{ item.id }}" class="btn btn-warning">
+            Цена - {{item.price}}, Дата создание - {{item.link}}
+        </div>
+        <div>
+            <a href="/items/{{ item.id }}" class="btn btn-warning">
                 Изменить
             </a>
-            <a href="/news_delete/{{ item.id }}" class="btn btn-danger">
+            <a href="/items_delete/{{ item.id }}" class="btn btn-danger">
                 Удалить
             </a>
         </div>

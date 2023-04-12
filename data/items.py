@@ -6,17 +6,20 @@ from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 
 
-class News(SqlAlchemyBase, UserMixin, SerializerMixin):
-    __tablename__ = 'news'
+class Items(SqlAlchemyBase, UserMixin, SerializerMixin):
+    __tablename__ = 'items'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    creator = sqlalchemy.Column(sqlalchemy.String, default='Admin')
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     content = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     is_private = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
+    price = sqlalchemy.Column(sqlalchemy.Integer, default=0)
+    link = sqlalchemy.Column(sqlalchemy.String, default='None')
     categories = orm.relationship("Category",
                                   secondary="association",
-                                  backref="news")
+                                  backref="items")
 
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     user = orm.relationship('User')
