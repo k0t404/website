@@ -6,7 +6,8 @@
 {% if current_user.is_authenticated and item.user != current_user %}
 <div class="col-md6 border rounded">
         <h2>{{item.title}}</h2>
-        <a href="items" class="btn btn-secondary">Добавить в отслеживаемое</a>
+        <a href="/items/{{ item.id }}" class="btn btn-secondary">
+            Добавить в отслеживаемое</a>
         <div>
             {{item.content}}
         </div>
@@ -14,7 +15,7 @@
             Автор - {{item.user.name}}, Дата создание - {{item.created_date}}
         </div>
         <div>
-            Цена - {{item.price}}, Дата создание - {{item.link}}
+            Цена - {{item.price}}, Ссылка - {{item.link}}
         </div>
 </div>
 {% endif %}
@@ -28,7 +29,7 @@
             Автор - {{item.user.name}}, Дата создание - {{item.created_date}}
         </div>
         <div>
-            Цена - {{item.price}}, Дата создание - {{item.link}}
+            Цена - {{item.price}}, Ссылка - {{item.link}}
         </div>
 </div>
 {% endif %}

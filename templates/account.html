@@ -13,10 +13,10 @@
             Автор - {{item.user.name}}, Дата написания - {{item.created_date}}
         </div>
         <div>
-            Цена - {{item.price}}, Дата создание - {{item.link}}
+            Цена - {{item.price}}, Ссылка - {{item.link}}
         </div>
         <div>
-            <a href="/items/{{ item.id }}" class="btn btn-warning">
+            <a href="/items_edit/{{ item.id }}" class="btn btn-warning">
                 Изменить
             </a>
             <a href="/items_delete/{{ item.id }}" class="btn btn-danger">

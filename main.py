@@ -88,24 +88,29 @@ def session_test():
         f"Вы пришли на эту страницу {visits_count + 1} раз")
 
 
-@app.route('/items',  methods=['GET', 'POST'])
+@app.route('/items/<int:id>',  methods=['GET', 'POST'])
 @login_required
-def add_news():
+def add_news(id):
     form = ItemsForm()
+    db_sess = db_session.create_session()
+    info = db_sess.query(Items).filter(Items.id == id).first()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         items = Items()
         items.title = form.title.data
         items.content = form.content.data
         items.is_private = form.is_private.data
-        current_user.news.append(items)
+        items.price = info.price
+        items.link = info.link
+        items.creator = info.user.name
+        current_user.items.append(items)
         db_sess.merge(current_user)
         db_sess.commit()
         return redirect('/')
     return render_template('items.html', title='Добавление в отслеживаемое', form=form)
 
 
-@app.route('/items/<int:id>', methods=['GET', 'POST'])
+@app.route('/items_edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_items(id):
     form = ItemsForm()

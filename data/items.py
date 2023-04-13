@@ -10,7 +10,7 @@ class Items(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'items'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    creator = sqlalchemy.Column(sqlalchemy.String, default='Admin')
+    creator = sqlalchemy.Column(sqlalchemy.String, default='Other')
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     content = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
