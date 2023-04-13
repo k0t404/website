@@ -43,7 +43,7 @@ def index():
             (Items.user == current_user) | (Items.is_private != True))
     else:
         items = db_sess.query(Items).filter(Items.is_private != True)
-    return render_template("index.html", news=items)
+    return render_template("index.html", items=items)
 
 
 @app.route("/account")
