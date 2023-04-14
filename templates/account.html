@@ -2,7 +2,8 @@
 
 {% block content %}
 <h1>Ваш профиль</h1>
-{% for item in items%}
+<a href="/items_add" class="btn btn-success"> Создать отслеживаемый предмет </a>
+{% for item in items %}
 {% if item.user == current_user %}
 <div class="col-md6 border rounded">
         <h2>{{item.title}}</h2>
@@ -10,7 +11,7 @@
             {{item.content}}
         </div>
         <div>
-            Автор - {{item.user.name}}, Дата написания - {{item.created_date}}
+            Автор - {{item.creator}}, Дата написания - {{item.created_date}}
         </div>
         <div>
             Цена - {{item.price}}, Ссылка - {{item.link}}

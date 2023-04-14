@@ -90,7 +90,7 @@ def session_test():
 
 @app.route('/items/<int:id>',  methods=['GET', 'POST'])
 @login_required
-def add_news(id):
+def add_items(id):
     form = ItemsForm()
     db_sess = db_session.create_session()
     info = db_sess.query(Items).filter(Items.id == id).first()
@@ -108,6 +108,26 @@ def add_news(id):
         db_sess.commit()
         return redirect('/')
     return render_template('items.html', title='Добавление в отслеживаемое', form=form)
+
+
+@app.route('/items_add',  methods=['GET', 'POST'])
+@login_required
+def add_new_items():
+    form = ItemsForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        items = Items()
+        items.title = form.title.data
+        items.content = form.content.data
+        items.is_private = form.is_private.data
+        items.price = form.price.data
+        items.link = form.link.data
+        items.creator = current_user.name
+        current_user.items.append(items)
+        db_sess.merge(current_user)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('items_add.html', title='Создать отслеживаемое', form=form)
 
 
 @app.route('/items_edit/<int:id>', methods=['GET', 'POST'])
@@ -134,7 +154,7 @@ def edit_items(id):
             return redirect('/')
         else:
             abort(404)
-    return render_template('items.html',
+    return render_template('items_edit.html',
                            title='Редактирование отслеживаемого',
                            form=form
                            )
@@ -233,6 +253,29 @@ def main():
     items.is_private = False
     items.user_id = 1
     items.price = 500
+    items.creator =  'Ridley'
+
+    db_sess.add(items)
+
+    items = Items()
+    items.title = 'dee'
+    items.content = 'ge'
+    items.created_date = datetime.date.today()
+    items.is_private = False
+    items.user_id = 3
+    items.price = 500
+    items.creator = 'q'
+
+    db_sess.add(items)
+
+    items = Items()
+    items.title = 'fike'
+    items.content = 'yhjh'
+    items.created_date = datetime.date.today()
+    items.is_private = False
+    items.user_id = 4
+    items.price = 500
+    items.creator = 'admin'
 
     db_sess.add(items)
     db_sess.commit()'''

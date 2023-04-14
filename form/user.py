@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired
 
 
 class ItemsForm(FlaskForm):
-    title = StringField('Заголовок', validators=[DataRequired()])
+    title = StringField('Название', validators=[DataRequired()])
     content = TextAreaField("Содержание")
     is_private = BooleanField("Личное")
     price = IntegerField('Цена')

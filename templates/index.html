@@ -2,31 +2,32 @@
 
 {% block content %}
 <h1>Предметы</h1>
-{% for item in items%}
-{% if current_user.is_authenticated and item.user != current_user %}
+{% for item in items %}
+{% if current_user.is_authenticated and item.user.name == item.creator and not item.is_private %}
 <div class="col-md6 border rounded">
         <h2>{{item.title}}</h2>
-        <a href="/items/{{ item.id }}" class="btn btn-secondary">
-            Добавить в отслеживаемое</a>
+        {% if item.user != current_user %}
+            <a href="/items/{{ item.id }}" class="btn btn-secondary"> Добавить в отслеживаемое</a>
+        {% endif %}
         <div>
             {{item.content}}
         </div>
         <div>
-            Автор - {{item.user.name}}, Дата создание - {{item.created_date}}
+            Автор - {{item.creator}}, Дата создание - {{item.created_date}}
         </div>
         <div>
             Цена - {{item.price}}, Ссылка - {{item.link}}
         </div>
 </div>
 {% endif %}
-{% if not current_user.is_authenticated and item.user.name == 'Admin' %}
+{% if not current_user.is_authenticated and item.user.name == 'admin' %}
 <div class="col-md6 border rounded">
         <h2>{{item.title}}</h2>
         <div>
             {{item.content}}
         </div>
         <div>
-            Автор - {{item.user.name}}, Дата создание - {{item.created_date}}
+            Автор - {{item.creator}}, Дата создание - {{item.created_date}}
         </div>
         <div>
             Цена - {{item.price}}, Ссылка - {{item.link}}
