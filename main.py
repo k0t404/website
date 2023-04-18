@@ -12,7 +12,7 @@ import logging
 from telegram.ext import Application, MessageHandler, filters
 from config import BOT_TOKEN
 from telegram.ext import CommandHandler
-from command import help_command, date, time, address, phone, help, site, work_time, echo, close_keyboard, start
+from command import close_keyboard, start, all_things, one_thing, delete_thing, add_thing, helper
 
 
 app = Flask(__name__)
@@ -298,17 +298,18 @@ def main():
     application = Application.builder().token(BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("date", date))
-    application.add_handler(CommandHandler("time", time))
-    application.add_handler(CommandHandler("address", address))
-    application.add_handler(CommandHandler("phone", phone))
-    application.add_handler(CommandHandler("site", site))
-    application.add_handler(CommandHandler("work_time", work_time))
-    application.add_handler(CommandHandler("help", help))
-    application.add_handler(CommandHandler("close", close_keyboard))
+    application.add_handler(CommandHandler("help", helper))
+    application.add_handler(CommandHandler("Помощь", helper))
+    application.add_handler(CommandHandler("all_things", all_things))
+    application.add_handler(CommandHandler("Вывести все ваши товары", all_things))
+    application.add_handler(CommandHandler("one_thing", one_thing))
+    application.add_handler(CommandHandler("Вывести определенный ваш товар", one_thing))
+    application.add_handler(CommandHandler("delete_thing", delete_thing))
+    application.add_handler(CommandHandler("Удалить товар", delete_thing))
+    application.add_handler(CommandHandler("add_thing", add_thing))
+    application.add_handler(CommandHandler("Добавить товар", add_thing))
 
-    text_handler = MessageHandler(filters.TEXT, echo)
+    text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, add_thing)
 
     # Регистрируем обработчик в приложении.
     application.add_handler(text_handler)
