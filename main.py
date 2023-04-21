@@ -46,17 +46,36 @@ def index():
     return render_template("index.html", items=items)
 
 
+@app.route("/other_users")
+def other_users():
+    db_sess = db_session.create_session()
+    if current_user.is_authenticated:
+        users = db_sess.query(User).filter((User != current_user))
+    else:
+        users = db_sess.query(User)
+    return render_template("other_users.html", users=users)
+
+
 @app.route("/about")
 def about():
     return render_template("about.html")
+
+
+@app.route("/account_other/<name>")
+def account_other(name):
+    db_sess = db_session.create_session()
+    if current_user.is_authenticated:
+        items = db_sess.query(Items)
+    else:
+        items = None
+    return render_template("account_other.html", items=items, name=name)
 
 
 @app.route("/account")
 def account():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
-        items = db_sess.query(Items).filter(
-            (Items.user == current_user) | (Items.is_private != True))
+        items = db_sess.query(Items).filter(Items.user == current_user)
     else:
         items = None
     return render_template("account.html", items=items)

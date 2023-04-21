@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Профиль пользователя {{name}}</h1>
+{% for item in items %}
+{% if item.user.name == name and not item.is_private%}
+<div class="col-md6 border rounded">
+        <h2>{{item.title}}</h2>
+        <a href="/items/{{ item.id }}" class="btn btn-secondary"> Добавить в отслеживаемое</a>
+        <div>
+            {{item.content}}
+        </div>
+        <div>
+            Автор - {{item.creator}}, Дата написания - {{item.created_date}}
+        </div>
+        <div>
+            Цена - {{item.price}}, Ссылка - {{item.link}}
+        </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}
