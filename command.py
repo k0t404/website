@@ -1,11 +1,20 @@
 from telegram import ReplyKeyboardRemove
 from telegram import ReplyKeyboardMarkup
 from flask import redirect, render_template
+import logging
 from data.items import Items
 from data.users import User
 from flask_login import current_user
 from data import db_session
 # t.me/help_with_items_bot - ссылка на бота
+
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+)
+
+logger = logging.getLogger(__name__)
+
 
 
 async def start(update, context):
@@ -17,8 +26,8 @@ async def start(update, context):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.email == email).first()
     if user and user.check_password(password):
-        reply_keyboard = [['/Вывести все ваши товары', '/Вывести определенный ваш товар'],
-                          ['/Удалить товар', '/Добавить товар', '/Помощь']]
+        reply_keyboard = [['/all_things', '/one_thing'],
+                          ['/delete_thing', '/add_thing', '/help']]
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
         await update.message.reply_text(
             "Вы прошли авторизацию. Выберите действие с отслеживаемыми товарами",
@@ -35,8 +44,8 @@ async def helper(update, context):
     await update.message.reply_text("Вывести определенный выбранный вами товар")
     await update.message.reply_text("Добавить товар")
     await update.message.reply_text("Удaлить товар")
-    reply_keyboard = [['Вывести все ваши товары', 'Вывести определенный ваш товар'],
-                      ['Удалить товар', 'Добавить товар']]
+    reply_keyboard = [['/all_things', '/one_thing'],
+                      ['/delete_thing', '/add_thing']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
     await update.message.reply_text(
         reply_markup=markup
@@ -56,8 +65,8 @@ async def delete_thing(update, context):
 
 
 async def add_thing(update, context):
-    await update.message.reply_text("Ввелите данные о товаре ввиде: ваш мейл, название, описание, приватен ли предмет для прсмотра, цена, ссылка на товар")
-    email, title, content, is_private, price, link = update.message.text.split(', ')
+    await update.message.reply_text("Ввелите данные о товаре ввиде: ваше имя, название, описание, приватен ли предмет для прсмотра, цена, ссылка на товар")
+    name_user, title, content, is_private, price, link = update.message.text.split(', ')
     db_sess = db_session.create_session()
     title = db_sess.query(Items).filter(Items.title == title).first()
     if title:
@@ -69,7 +78,7 @@ async def add_thing(update, context):
     items.is_private = is_private
     items.price = price
     items.link = link
-    items.creator = email
+    items.creator = name_user
     current_user.items.append(items)
     db_sess.merge(current_user)
     db_sess.commit()

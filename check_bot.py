@@ -22,6 +22,12 @@ from telegram.ext import CommandHandler
 from command import close_keyboard, start, all_things, one_thing, delete_thing, add_thing, helper
 
 # t.me/help_with_items_bot - ссылка на бота
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+)
+
+logger = logging.getLogger(__name__)
+
 
 
 async def start(update, context):
@@ -42,6 +48,7 @@ async def start(update, context):
         )
     else:
         await update.message.reply_text('Неправильный логин или пароль')
+    return ''
 
 
 async def helper(update, context):
@@ -57,6 +64,7 @@ async def helper(update, context):
     await update.message.reply_text(
         reply_markup=markup
     )
+    return ''
 
 
 async def all_things(update, context):
@@ -112,9 +120,14 @@ def main():
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", helper))
+    application.add_handler(CommandHandler("Помощь", helper))
+    application.add_handler(CommandHandler("all_things", all_things))
     application.add_handler(CommandHandler("all_things", all_things))
     application.add_handler(CommandHandler("one_thing", one_thing))
+    application.add_handler(CommandHandler("one_thing", one_thing))
     application.add_handler(CommandHandler("delete_thing", delete_thing))
+    application.add_handler(CommandHandler("delete_thing", delete_thing))
+    application.add_handler(CommandHandler("add_thing", add_thing))
     application.add_handler(CommandHandler("add_thing", add_thing))
 
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, add_thing)
