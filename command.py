@@ -1,7 +1,10 @@
 from telegram import ReplyKeyboardRemove
-from data.users import User
-from data import db_session
 from telegram import ReplyKeyboardMarkup
+from flask import redirect, render_template
+from data.items import Items
+from data.users import User
+from flask_login import current_user
+from data import db_session
 # t.me/help_with_items_bot - ссылка на бота
 
 
@@ -53,7 +56,32 @@ async def delete_thing(update, context):
 
 
 async def add_thing(update, context):
-    await update.message.reply_text("Не готово")
+    await update.message.reply_text("Ввелите данные о товаре ввиде: ваш мейл, название, описание, приватен ли предмет для прсмотра, цена, ссылка на товар")
+    email, title, content, is_private, price, link = update.message.text.split(', ')
+    db_sess = db_session.create_session()
+    title = db_sess.query(Items).filter(Items.title == title).first()
+    if title:
+        await update.message.reply_text('Товар уже присутствует')
+        return ''
+    items = Items()
+    items.title = title
+    items.content = content
+    items.is_private = is_private
+    items.price = price
+    items.link = link
+    items.creator = email
+    current_user.items.append(items)
+    db_sess.merge(current_user)
+    db_sess.commit()
+    title = db_sess.query(Items).filter(Items.title == title).first()
+    if title:
+        await update.message.reply_text('Товар добавлен успешно')
+        return ''
+    await update.message.reply_text('Товар не добавлен,попробуйте заново')
+    return ''
+
+
+
 
 
 async def close_keyboard(update, context):

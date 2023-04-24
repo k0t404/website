@@ -318,15 +318,10 @@ def main():
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", helper))
-    application.add_handler(CommandHandler("Помощь", helper))
     application.add_handler(CommandHandler("all_things", all_things))
-    application.add_handler(CommandHandler("Вывести все ваши товары", all_things))
     application.add_handler(CommandHandler("one_thing", one_thing))
-    application.add_handler(CommandHandler("Вывести определенный ваш товар", one_thing))
     application.add_handler(CommandHandler("delete_thing", delete_thing))
-    application.add_handler(CommandHandler("Удалить товар", delete_thing))
     application.add_handler(CommandHandler("add_thing", add_thing))
-    application.add_handler(CommandHandler("Добавить товар", add_thing))
 
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, add_thing)
 
