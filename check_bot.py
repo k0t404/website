@@ -1,4 +1,4 @@
-from data import db_session, items_api, items_resources, users_resources
+from data import db_session
 from telegram.ext import Application, MessageHandler, filters
 from config import BOT_TOKEN
 from telegram.ext import CommandHandler
