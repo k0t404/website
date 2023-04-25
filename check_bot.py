@@ -1,5 +1,4 @@
-from telegram import ReplyKeyboardRemove
-from telegram import ReplyKeyboardMarkup
+from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
 from flask import redirect, render_template
 from data.items import Items
 from data.users import User

@@ -9,7 +9,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from data import db_session, items_api, items_resources, users_resources
 from flask_restful import Api
 import logging
-from telegram.ext import Application, MessageHandler, filters
+from telegram.ext import Application
 from config import BOT_TOKEN
 from telegram.ext import CommandHandler
 from command import close_keyboard, start, all_things, one_thing, delete_thing, add_thing, helper
@@ -23,6 +23,8 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
 
 
 @app.errorhandler(404)
@@ -322,13 +324,6 @@ def main():
     application.add_handler(CommandHandler("one_thing", one_thing))
     application.add_handler(CommandHandler("delete_thing", delete_thing))
     application.add_handler(CommandHandler("add_thing", add_thing))
-
-    text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, add_thing)
-
-    # Регистрируем обработчик в приложении.
-    application.add_handler(text_handler)
-
-    # Запускаем приложение.
     application.run_polling()
 
 

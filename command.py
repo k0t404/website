@@ -15,20 +15,20 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+reply_keyboard = [['/all_things', '/one_thing'],
+                      ['/delete_thing', '/add_thing']]
+markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+
 
 
 async def start(update, context):
     await update.message.reply_text(
-        "Я бот-справочник. Введите email и пароль от своего аккаунта",
-        # reply_markup=markup
-    )
+        "Я бот-справочник. Введите email и пароль от своего аккаунта",)
+    print(update.message.text.split())
     email, password = update.message.text.split()
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.email == email).first()
     if user and user.check_password(password):
-        reply_keyboard = [['/all_things', '/one_thing'],
-                          ['/delete_thing', '/add_thing', '/help']]
-        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
         await update.message.reply_text(
             "Вы прошли авторизацию. Выберите действие с отслеживаемыми товарами",
             reply_markup=markup
@@ -44,16 +44,17 @@ async def helper(update, context):
     await update.message.reply_text("Вывести определенный выбранный вами товар")
     await update.message.reply_text("Добавить товар")
     await update.message.reply_text("Удaлить товар")
-    reply_keyboard = [['/all_things', '/one_thing'],
-                      ['/delete_thing', '/add_thing']]
-    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
-    await update.message.reply_text(
-        reply_markup=markup
-    )
+    await update.message.reply_text(reply_markup=markup)
 
 
 async def all_things(update, context):
     await update.message.reply_text("Не готово")
+
+
+async def echo(update, context):
+    await update.message.reply_text(
+        reply_markup=markup
+    )
 
 
 async def one_thing(update, context):
@@ -85,9 +86,7 @@ async def add_thing(update, context):
     title = db_sess.query(Items).filter(Items.title == title).first()
     if title:
         await update.message.reply_text('Товар добавлен успешно')
-        return ''
     await update.message.reply_text('Товар не добавлен,попробуйте заново')
-    return ''
 
 
 
