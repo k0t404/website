@@ -1,6 +1,6 @@
 import telebot
 from config import BOT_TOKEN
-from command import url, starts, helper, authorization, add_thing, question, delete_thing
+from command import url, starts, helper, authorization, add_thing, question, delete_thing, one_thing
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -43,9 +43,18 @@ def get_text_messages(message):
                          "Ввелите данные о товаре ввиде: Новый товар, ваше имя, название, описание, "
                          "приватен ли предмет для прсмотра, цена, ссылка на товар")
 
+    elif message.text == 'Вывести определённый товар':
+        bot.send_message(message.from_user.id, "Ввелите данные о товаре ввиде: Поиск_1 {ваше_имя} {товар}")
+
+    elif 'Поиск_1' in message.text:
+        one_thing(message, message.text)
+
 
     elif 'Новый товар' in message.text:
         add_thing(message, message.text)
+
+    else:
+        bot.send_message(message.from_user.id, "Используйте клавиатуру")
 
 bot.polling(none_stop=True, interval=0) #обязательная для работы бота часть
 

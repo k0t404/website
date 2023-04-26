@@ -75,12 +75,38 @@ def helper(message):
     bot.send_message(message.from_user.id, "Удaлить товар", reply_markup=markup)
 
 
-async def all_things(update, context):
+def all_things(update, context):
     await update.message.reply_text("Не готово")
 
 
-async def one_thing(update, context):
-    await update.message.reply_text("Не готово")
+def one_thing(message, messag):
+    db_sess = db_session.create_session()
+    pop, user_name, title = messag
+    items = db_sess.query(Items).filter(Items.title == title, Items.user == user_name).first()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # создание новых кнопок
+    btn1 = types.KeyboardButton('Что может бот?')
+    btn4 = types.KeyboardButton('Ссылка на сайт')
+    btn2 = types.KeyboardButton('Добавить товар')
+    btn3 = types.KeyboardButton('Удалить товар')
+    btn5 = types.KeyboardButton('Вывести определённый товар')
+    btn6 = types.KeyboardButton('Вывести все товары')
+    markup.add(btn1, btn2, btn3, btn4, btn6, btn5)
+    if items:
+        content = items.content
+        if items.is_private == '1':
+            is_private = 'Да'
+        else:
+            is_private = 'Нет'
+        link = items.link
+        categories = items.categories
+        bot.send_message(message.from_user.id, f"Данные о товаре {title}")
+        bot.send_message(message.from_user.id, f'{content}')
+        bot.send_message(message.from_user.id, f"Личное:{is_private}")
+        bot.send_message(message.from_user.id, f'Ссылка:{link}')
+        bot.send_message(message.from_user.id, f'Категория:{categories}', reply_markup=markup)
+    else:
+        bot.send_message(message.from_user.id, f'Товар не найден, попробуйте заново', reply_markup=markup)
+
 
 
 def delete_thing(messag, message):
