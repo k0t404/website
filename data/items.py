@@ -17,9 +17,7 @@ class Items(SqlAlchemyBase, UserMixin, SerializerMixin):
     is_private = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
     price = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     link = sqlalchemy.Column(sqlalchemy.String, default='None')
-    categories = orm.relationship("Category",
-                                  secondary="association",
-                                  backref="items")
+    category = sqlalchemy.Column(sqlalchemy.String, default='Другое')
 
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     user = orm.relationship('User')

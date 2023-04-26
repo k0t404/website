@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, TextAreaField, SubmitField, BooleanField, IntegerField, DateField
+from wtforms import PasswordField, StringField, TextAreaField, SubmitField, BooleanField, IntegerField, SelectField
 from wtforms.fields import EmailField
 from wtforms.validators import DataRequired
 
@@ -10,6 +10,7 @@ class ItemsForm(FlaskForm):
     is_private = BooleanField("Личное")
     price = IntegerField('Цена')
     link = StringField('Ссылка')
+    category = SelectField('Категория', choices=['Творчество', 'Учеба', 'Спорт', 'Игры', 'Другое'])
     submit = SubmitField('Применить')
 
 

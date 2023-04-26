@@ -12,6 +12,7 @@
 </select>
 <a class="btn btn-warning" href="/sorted_by/{{categories}}">Отсортировать</a>
 {% for item in items %}
+{% if category == 'Все' or category == {{item.category}} %}
 {% if current_user.is_authenticated and item.user.name == item.creator and not item.is_private %}
 <div class="col-md6 border rounded">
         <h2>{{item.title}}</h2>
@@ -29,7 +30,7 @@
         </div>
 </div>
 {% endif %}
-{% if not current_user.is_authenticated and item.creator == 'admin' %}
+{% if not current_user.is_authenticated and item.user.name == 'admin' %}
 <div class="col-md6 border rounded">
         <h2>{{item.title}}</h2>
         <div>
@@ -42,6 +43,7 @@
             Цена - {{item.price}}, Ссылка - {{item.link}}, Категория - {{item.category}}
         </div>
 </div>
+{% endif %}
 {% endif %}
 {% endfor %}
 {% endblock %}
