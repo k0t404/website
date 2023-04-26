@@ -6,13 +6,13 @@ from data.items import Items
 from data.users import User
 from form.user import LoginForm, RegisterForm, ItemsForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from data import db_session, items_api, items_resources, users_resources
+from data import db_session
 from flask_restful import Api
 import logging
 from telegram.ext import Application, MessageHandler, filters
 from config import BOT_TOKEN
 from telegram.ext import CommandHandler
-from command import close_keyboard, start, all_things, one_thing, delete_thing, add_thing, helper
+from command import all_things, one_thing, delete_thing, add_thing, helper
 
 
 app = Flask(__name__)
@@ -304,15 +304,15 @@ def main():
     db_sess.add(items)
     db_sess.commit()'''
 
-    api.add_resource(users_resources.UsersListResource, '/api/v2/users')
+    '''api.add_resource(users_resources.UsersListResource, '/api/v2/users')
     api.add_resource(users_resources.UsersResource, '/api/v2/users/<int:users_id>')
     api.add_resource(items_resources.ItemListResource, '/api/v2/items')
     api.add_resource(items_resources.ItemResource, '/api/v2/items/<int:items_id>')
     app.register_blueprint(items_api.blueprint)
-    app.run()
+    app.run()'''
 
     "-------------BOT_____BOT-----BOT_____BOT-----BOT_____BOT-------------"
-    # Создаём объект Application.
+    '''# Создаём объект Application.
     # Вместо слова "TOKEN" надо разместить полученный от @BotFather токен
     application = Application.builder().token(BOT_TOKEN).build()
 
@@ -334,7 +334,7 @@ def main():
     application.add_handler(text_handler)
 
     # Запускаем приложение.
-    application.run_polling()
+    application.run_polling()'''
 
 
 if __name__ == '__main__':

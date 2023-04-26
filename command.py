@@ -58,6 +58,7 @@ def question(message):
     bot.send_message(message.from_user.id, "Все вопросы можно писать на нашу почту")
     bot.send_message(message.from_user.id, "cot5626@mail.ru", reply_markup=markup)
 
+
 def helper(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # создание новых кнопок
     btn1 = types.KeyboardButton('Что может бот?')
@@ -75,8 +76,8 @@ def helper(message):
     bot.send_message(message.from_user.id, "Удaлить товар", reply_markup=markup)
 
 
-def all_things(update, context):
-    await update.message.reply_text("Не готово")
+def all_things(update, context):    # Не готово
+    pass
 
 
 def one_thing(message, messag):
