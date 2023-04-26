@@ -6,7 +6,7 @@ from data.items import Items
 from data.users import User
 from form.user import LoginForm, RegisterForm, ItemsForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from data import db_session, items_api, items_resources, users_resources
+from data import db_session
 from flask_restful import Api
 import logging
 from telegram.ext import Application
@@ -88,30 +88,6 @@ def account():
 def logout():
     logout_user()
     return redirect("/")
-
-
-@app.route("/cookie_test")
-def cookie_test():
-    visits_count = int(request.cookies.get("visits_count", 0))
-    if visits_count:
-        res = make_response(
-            f"Вы пришли на эту страницу {visits_count + 1} раз")
-        res.set_cookie("visits_count", str(visits_count + 1),
-                       max_age=60 * 60 * 24 * 365 * 2)
-    else:
-        res = make_response(
-            "Вы пришли на эту страницу в первый раз за последние 2 года")
-        res.set_cookie("visits_count", '1',
-                       max_age=60 * 60 * 24 * 365 * 2)
-    return res
-
-
-@app.route("/session_test")
-def session_test():
-    visits_count = session.get('visits_count', 0)
-    session['visits_count'] = visits_count + 1
-    return make_response(
-        f"Вы пришли на эту страницу {visits_count + 1} раз")
 
 
 @app.route('/items/<int:id>',  methods=['GET', 'POST'])
@@ -306,11 +282,6 @@ def main():
     db_sess.add(items)
     db_sess.commit()'''
 
-    api.add_resource(users_resources.UsersListResource, '/api/v2/users')
-    api.add_resource(users_resources.UsersResource, '/api/v2/users/<int:users_id>')
-    api.add_resource(items_resources.ItemListResource, '/api/v2/items')
-    api.add_resource(items_resources.ItemResource, '/api/v2/items/<int:items_id>')
-    app.register_blueprint(items_api.blueprint)
     app.run()
 
     "-------------BOT_____BOT-----BOT_____BOT-----BOT_____BOT-------------"
