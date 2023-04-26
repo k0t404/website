@@ -46,18 +46,6 @@ def index():
     return render_template("index.html", items=items)
 
 
-@app.route("/sorted_by/<category>")
-def index2(category):
-    print(category)
-    db_sess = db_session.create_session()
-    if current_user.is_authenticated:
-        items = db_sess.query(Items).filter(
-            (Items.user == current_user) | (Items.is_private != True))
-    else:
-        items = db_sess.query(Items).filter(Items.is_private != True)
-    return render_template("index2.html", items=items, category=category)
-
-
 @app.route("/other_users")
 def other_users():
     db_sess = db_session.create_session()
@@ -100,6 +88,30 @@ def logout():
     return redirect("/")
 
 
+@app.route("/cookie_test")
+def cookie_test():
+    visits_count = int(request.cookies.get("visits_count", 0))
+    if visits_count:
+        res = make_response(
+            f"Вы пришли на эту страницу {visits_count + 1} раз")
+        res.set_cookie("visits_count", str(visits_count + 1),
+                       max_age=60 * 60 * 24 * 365 * 2)
+    else:
+        res = make_response(
+            "Вы пришли на эту страницу в первый раз за последние 2 года")
+        res.set_cookie("visits_count", '1',
+                       max_age=60 * 60 * 24 * 365 * 2)
+    return res
+
+
+@app.route("/session_test")
+def session_test():
+    visits_count = session.get('visits_count', 0)
+    session['visits_count'] = visits_count + 1
+    return make_response(
+        f"Вы пришли на эту страницу {visits_count + 1} раз")
+
+
 @app.route('/items/<int:id>',  methods=['GET', 'POST'])
 @login_required
 def add_items(id):
@@ -135,7 +147,6 @@ def add_new_items():
         items.price = form.price.data
         items.link = form.link.data
         items.creator = current_user.name
-        items.category = form.category.data
         current_user.items.append(items)
         db_sess.merge(current_user)
         db_sess.commit()
@@ -266,7 +277,6 @@ def main():
     items.is_private = False
     items.user_id = 1
     items.price = 500
-    items.category = 'Творчество'
     items.creator =  'Ridley'
 
     db_sess.add(items)
@@ -278,7 +288,6 @@ def main():
     items.is_private = False
     items.user_id = 3
     items.price = 500
-    items.category = 'Творчество'
     items.creator = 'q'
 
     db_sess.add(items)
@@ -290,14 +299,20 @@ def main():
     items.is_private = False
     items.user_id = 4
     items.price = 500
-    items.category = 'Другое'
     items.creator = 'admin'
 
     db_sess.add(items)
     db_sess.commit()'''
 
+    api.add_resource(users_resources.UsersListResource, '/api/v2/users')
+    api.add_resource(users_resources.UsersResource, '/api/v2/users/<int:users_id>')
+    api.add_resource(items_resources.ItemListResource, '/api/v2/items')
+    api.add_resource(items_resources.ItemResource, '/api/v2/items/<int:items_id>')
+    app.register_blueprint(items_api.blueprint)
+    app.run()
+
     "-------------BOT_____BOT-----BOT_____BOT-----BOT_____BOT-------------"
-    '''# Создаём объект Application.
+    # Создаём объект Application.
     # Вместо слова "TOKEN" надо разместить полученный от @BotFather токен
     application = Application.builder().token(BOT_TOKEN).build()
 
@@ -319,7 +334,7 @@ def main():
     application.add_handler(text_handler)
 
     # Запускаем приложение.
-    application.run_polling()'''
+    application.run_polling()
 
 
 if __name__ == '__main__':
