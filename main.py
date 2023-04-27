@@ -9,10 +9,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from data import db_session
 from flask_restful import Api
 import logging
-from telegram.ext import Application, MessageHandler, filters
-from config import BOT_TOKEN
-from telegram.ext import CommandHandler
-from command import all_things, one_thing, delete_thing, add_thing, helper
 
 
 app = Flask(__name__)

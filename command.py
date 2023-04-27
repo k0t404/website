@@ -5,7 +5,6 @@ from link_to_site import link
 from data import db_session
 from data.items import Items
 from data.users import User
-from flask_login import current_user
 
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -77,15 +76,40 @@ def helper(message):
     bot.send_message(message.from_user.id, "Удaлить товар", reply_markup=markup)
 
 
-def all_things(update, context):    # Не готово
-    pass
+def all_things(message, messag):
+    db_sess = db_session.create_session()
+    pop, pop2, name = messag
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # создание новых кнопок
+    btn1 = types.KeyboardButton('Что может бот?')
+    btn4 = types.KeyboardButton('Ссылка на сайт')
+    btn2 = types.KeyboardButton('Добавить товар')
+    btn3 = types.KeyboardButton('Удалить товар')
+    btn5 = types.KeyboardButton('Вывести определённый товар')
+    btn6 = types.KeyboardButton('Вывести все товары')
+    markup.add(btn1, btn2, btn3, btn4, btn6, btn5)
+    user = db_sess.query(User).filter(User.name == name).first()
+    if user:
+        items = db_sess.query(Items).filter(Items.creator == name)
+        if items:
+            bot.send_message(message.from_user.id, f"Товары {name}:")
+            for item in items:
+                bot.send_message(message.from_user.id, f"{item.title}")
+            bot.send_message(message.from_user.id, '', reply_markup=markup)
+        else:
+            bot.send_message(message.from_user.id, 'У данного пользователя нет товаров', reply_markup=markup)
+    else:
+        bot.send_message(message.from_user.id, 'Данный пользователь не найден', reply_markup=markup)
+
+
+
+
 
 
 def one_thing(message, messag):
     pop, user_name, title = messag
 
     db_sess = db_session.create_session()
-    items = db_sess.query(Items).filter(Items.title == title, Items.user.name == user_name).first()
+    items = db_sess.query(Items).filter(Items.title == title, Items.creator == user_name).first()
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # создание новых кнопок
     btn1 = types.KeyboardButton('Что может бот?')
@@ -102,12 +126,12 @@ def one_thing(message, messag):
         else:
             is_private = 'Нет'
         link_to_market = items.link
-        categories = items.categories
-        bot.send_message(message.from_user.id, f"Данные о товаре {title}")
-        bot.send_message(message.from_user.id, f'{content}')
+        categorye = items.category
+        bot.send_message(message.from_user.id, f"Данные о товаре: {title}")
+        bot.send_message(message.from_user.id, f'Описание: {content}')
         bot.send_message(message.from_user.id, f"Личное:{is_private}")
         bot.send_message(message.from_user.id, f'Ссылка:{link_to_market}')
-        bot.send_message(message.from_user.id, f'Категория:{categories}', reply_markup=markup)
+        bot.send_message(message.from_user.id, f'Категория:{categorye}', reply_markup=markup)
     else:
         bot.send_message(message.from_user.id, f'Товар не найден, попробуйте заново', reply_markup=markup)
 
@@ -124,7 +148,7 @@ def delete_thing(messag, message):
     pop, user_name, title = messag
     db_sess = db_session.create_session()
     items = db_sess.query(Items).filter(Items.title == title,
-                                        Items.user.name == user_name
+                                        Items.creator == user_name
                                         ).first()
     if items:
         db_sess.delete(items)
@@ -135,9 +159,10 @@ def delete_thing(messag, message):
 
 
 def add_thing(message, messag):
-    pop, name_user, title, content, is_private, price, link = messag.split(', ')
+    pop, name_user, titles, content, is_private, price, link, category = messag
     db_sess = db_session.create_session()
-    title = db_sess.query(Items).filter(Items.title == title).first()
+    title = db_sess.query(Items).filter(Items.title == titles).first()
+    idi = db_sess.query(User).filter(User.name == name_user).first()
     if title:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # создание новых кнопок
         btn1 = types.KeyboardButton('Что может бот?')
@@ -150,16 +175,20 @@ def add_thing(message, messag):
         bot.send_message(message.from_user.id, 'Товар уже присутствует', reply_markup=markup)
     else:
         items = Items()
-        items.title = title
+        items.title = titles
         items.content = content
-        items.is_private = is_private
+        if is_private == 'да' or is_private == 'Да':
+            items.is_private = True
+        else:
+            items.is_private = False
         items.price = price
         items.link = link
         items.creator = name_user
-        current_user.items.append(items)
-        db_sess.merge(current_user)
+        items.category = category
+        items.user_id = idi.id
+        db_sess.add(items)
         db_sess.commit()
-        title = db_sess.query(Items).filter(Items.title == title).first()
+        title = db_sess.query(Items).filter(Items.title == titles).first()
         if title:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # создание новых кнопок
             btn1 = types.KeyboardButton('Что может бот?')
