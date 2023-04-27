@@ -17,7 +17,8 @@ def start(message):
 def get_text_messages(message):
 
     if message.text == '👋 Поздороваться' or message.text == 'РеАвторизация':
-        bot.send_message(message.from_user.id, 'Для авторизации введите: Авторизация ваш email ваш пароль') #ответ бота
+        bot.send_message(message.from_user.id, 'Для авторизации введите: Авторизация ваш email ваш пароль')
+        # ответ бота
 
     elif 'Авторизация' in message.text:
         messag = message.text.split()
@@ -58,10 +59,8 @@ def get_text_messages(message):
 
     elif 'Полный' in message.text:
         all_things(message, message.text.split())
-
-
     else:
         bot.send_message(message.from_user.id, "Используйте клавиатуру")
 
 
-bot.polling(none_stop=True, interval=0) #обязательная для работы бота часть
+bot.polling(none_stop=True, interval=0)   # обязательная для работы бота часть
