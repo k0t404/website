@@ -101,10 +101,6 @@ def all_things(message, messag):
         bot.send_message(message.from_user.id, 'Данный пользователь не найден', reply_markup=markup)
 
 
-
-
-
-
 def one_thing(message, messag):
     pop, user_name, title = messag
 
