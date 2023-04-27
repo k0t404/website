@@ -2,15 +2,7 @@
 
 {% block content %}
 <h1>Предметы</h1>
-<select name="categories">
-    <option>Все</option>
-    <option>Творчество</option>
-    <option>Учеба</option>
-    <option>Спорт</option>
-    <option>Игры</option>
-    <option>Другое</option>
-</select>
-<a class="btn btn-warning" href="/sorted_by/{{categories}}">Отсортировать</a>
+<a class="btn btn-success" href="/sort_page">Отсортировать</a>
 {% for item in items %}
 {% if current_user.is_authenticated and item.user.name == item.creator and not item.is_private %}
 <div class="col-md6 border rounded">

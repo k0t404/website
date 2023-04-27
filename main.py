@@ -9,10 +9,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from data import db_session
 from flask_restful import Api
 import logging
-from telegram.ext import Application, MessageHandler, filters
-from config import BOT_TOKEN
-from telegram.ext import CommandHandler
-from command import all_things, one_thing, delete_thing, add_thing, helper
 
 
 app = Flask(__name__)
@@ -44,6 +40,23 @@ def index():
     else:
         items = db_sess.query(Items).filter(Items.is_private != True)
     return render_template("index.html", items=items)
+
+
+@app.route("/sort_page")
+def sorting_page():
+    return render_template("sort.html")
+
+
+@app.route("/sorted_by/<int:id>")
+def sort_by_category(id):
+    category = {1: 'Все', 2: 'Творчество', 3: 'Учеба', 4: 'Спорт', 5: 'Игры', 6: 'Другое'}
+    db_sess = db_session.create_session()
+    if current_user.is_authenticated:
+        items = db_sess.query(Items).filter(
+            (Items.user == current_user) | (Items.is_private != True))
+    else:
+        items = db_sess.query(Items).filter(Items.is_private != True)
+    return render_template("index2.html", items=items, category=category[id])
 
 
 @app.route("/other_users")
@@ -88,30 +101,6 @@ def logout():
     return redirect("/")
 
 
-@app.route("/cookie_test")
-def cookie_test():
-    visits_count = int(request.cookies.get("visits_count", 0))
-    if visits_count:
-        res = make_response(
-            f"Вы пришли на эту страницу {visits_count + 1} раз")
-        res.set_cookie("visits_count", str(visits_count + 1),
-                       max_age=60 * 60 * 24 * 365 * 2)
-    else:
-        res = make_response(
-            "Вы пришли на эту страницу в первый раз за последние 2 года")
-        res.set_cookie("visits_count", '1',
-                       max_age=60 * 60 * 24 * 365 * 2)
-    return res
-
-
-@app.route("/session_test")
-def session_test():
-    visits_count = session.get('visits_count', 0)
-    session['visits_count'] = visits_count + 1
-    return make_response(
-        f"Вы пришли на эту страницу {visits_count + 1} раз")
-
-
 @app.route('/items/<int:id>',  methods=['GET', 'POST'])
 @login_required
 def add_items(id):
@@ -147,6 +136,7 @@ def add_new_items():
         items.price = form.price.data
         items.link = form.link.data
         items.creator = current_user.name
+        items.category = form.category.data
         current_user.items.append(items)
         db_sess.merge(current_user)
         db_sess.commit()
@@ -216,11 +206,27 @@ def login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
+        important = ['!', '@', '#', '$', '%', '^', '&']
+        password_parts = list(set(form.password.data))
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация', form=form, message="Пароли не совпадают")
+        if len(form.password.data) < 8:
+            return render_template('register.html', title='Регистрация', form=form,
+                                   message="Длина пароля меньше 8 симвоов")
+        if len(password_parts) < 4:
+            return render_template('register.html', title='Регистрация', form=form,
+                                   message="Пароль должен содержать минимум 4 различных символа")
+        cou = 0
+        for element in password_parts:
+            if element in important:
+                cou += 1
+        if cou < 2:
+            return render_template('register.html', title='Регистрация', form=form,
+                                   message="Пароль должен содержать минимум 2 символа из этого списка ['!', '@', '#', '$', '%', '^', '&']")
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация', form=form, message="Такой пользователь уже есть")
+            return render_template('register.html', title='Регистрация', form=form,
+                                   message="Такой пользователь уже есть")
         user = User(
             name=form.name.data,
             email=form.email.data,
@@ -237,15 +243,6 @@ def register():
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
-
-
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
-)
-logger = logging.getLogger(__name__)
-
-# Определяем функцию-обработчик сообщений.
-# У неё два параметра, updater, принявший сообщение и контекст - дополнительная информация о сообщении.
 
 
 def main():
@@ -303,15 +300,6 @@ def main():
 
     db_sess.add(items)
     db_sess.commit()'''
-
-    '''api.add_resource(users_resources.UsersListResource, '/api/v2/users')
-    api.add_resource(users_resources.UsersResource, '/api/v2/users/<int:users_id>')
-    api.add_resource(items_resources.ItemListResource, '/api/v2/items')
-    api.add_resource(items_resources.ItemResource, '/api/v2/items/<int:items_id>')
-    app.register_blueprint(items_api.blueprint)
-    app.run()'''
-
-    "-------------BOT_____BOT-----BOT_____BOT-----BOT_____BOT-------------"
 
 
 if __name__ == '__main__':
