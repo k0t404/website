@@ -8,7 +8,6 @@ from form.user import LoginForm, RegisterForm, ItemsForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from data import db_session
 from flask_restful import Api
-import logging
 
 
 app = Flask(__name__)
