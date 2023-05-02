@@ -4,6 +4,7 @@ from flask import Flask, redirect, render_template, make_response, request, sess
 import datetime
 from data.items import Items
 from data.users import User
+from data.category import Category
 from form.user import LoginForm, RegisterForm, ItemsForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from data import db_session
@@ -43,12 +44,14 @@ def index():
 
 @app.route("/sort_page")
 def sorting_page():
-    return render_template("sort.html")
+    db_sess = db_session.create_session()
+    categories = db_sess.query(Category)
+    return render_template("sort.html", categories=categories)
 
 
 @app.route("/sorted_by/<int:id>")
 def sort_by_category(id):
-    category = {1: 'Все', 2: 'Творчество', 3: 'Учеба', 4: 'Спорт', 5: 'Игры', 6: 'Другое'}
+    category = {1: 'Все', 2: 'Учеба', 3: 'Творчество', 4: 'Спорт', 5: 'Игры', 6: 'Другое'}
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
         items = db_sess.query(Items).filter(
